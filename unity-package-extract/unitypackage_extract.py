@@ -12,9 +12,9 @@ def unity_extract_package(
 	*,
 	include_meta: bool = True,
 	overwrite: bool = False,
-):
+) -> None:
 	# Package file
-	package_path = Path(package_path)
+	package_path: Path = Path(package_path)
 	assert package_path.exists() and package_path.is_file(), "File does not exist or is not a file."
 
 	# Create output dir
@@ -22,13 +22,13 @@ def unity_extract_package(
 		output_dir: Path = package_path.with_name(package_path.stem)
 		output_dir.mkdir(exist_ok=overwrite)
 	else:
-		output_dir = Path(output_dir)
+		output_dir: Path = Path(output_dir)
 		output_dir.mkdir(exist_ok=True)
 
 	with tempfile.TemporaryDirectory() as temp_dir:
-		temp_dir = Path(temp_dir)
+		temp_dir: Path = Path(temp_dir)
 		logging.debug(f"Created temp dir at {temp_dir}")
-		extract_location = temp_dir / "Contents"
+		extract_location: Path = temp_dir / "Contents"
 
 		# Extract package contents to temp directory
 		with tarfile.open(package_path, 'r') as package:
@@ -38,14 +38,24 @@ def unity_extract_package(
 		# Copy files structurally to output directory
 		for asset_parent_dir in extract_location.glob("*"):
 			with open(asset_parent_dir / "pathname", 'rb') as f:
-				asset_dest_path = str(f.read(), encoding="utf8").strip()
-				asset_dest_path = output_dir / asset_dest_path
+				# Path in output folder
+				asset_dest_path: str = str(f.read(), encoding="utf8").strip()
+				asset_dest_path: Path = output_dir / asset_dest_path
 				asset_dest_path.parent.mkdir(exist_ok=True, parents=True)
-				
-				shutil.copy(asset_parent_dir / "asset", asset_dest_path)
+
+				# Path in temp folder
+				asset_src_path: Path = asset_parent_dir / "asset"
+
+				if not asset_src_path.exists():
+					continue
+
+				if asset_dest_path.exists():
+					continue
+
+				shutil.copy(asset_src_path, asset_dest_path)
 				logging.debug(f"Copied asset to {asset_dest_path.resolve()}")
 				if include_meta:
-					meta_dest_path = asset_dest_path.with_name(asset_dest_path.name + ".meta")
+					meta_dest_path: Path = asset_dest_path.with_name(asset_dest_path.name + ".meta")
 					shutil.copy(asset_parent_dir / "asset.meta", meta_dest_path)
 					logging.debug(f"Copied meta to {meta_dest_path.resolve()}")
 
