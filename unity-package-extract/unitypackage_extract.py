@@ -32,6 +32,7 @@ def unity_extract_package(
 
 		# Extract package contents to temp directory
 		with tarfile.open(package_path, 'r') as package:
+			logging.info(f"Extracting package to {extract_location.resolve()}")
 			package.extractall(extract_location)
 			logging.debug(f"Extracted package to {extract_location.resolve()}")
 
