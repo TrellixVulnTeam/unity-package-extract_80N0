@@ -6,7 +6,7 @@ import logging
 import shutil
 
 
-def unity_extract_package(
+def extract(
 	package_path: Path | str,
 	output_dir: Path | str = None,
 	*,
@@ -71,7 +71,7 @@ def main():
 
 	logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
-	unity_extract_package(
+	extract(
 		package_path=args.i.resolve(),
 		output_dir=args.output,
 		include_meta=not args.no_meta,
